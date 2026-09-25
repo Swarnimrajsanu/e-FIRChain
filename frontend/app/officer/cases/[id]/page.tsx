@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import api from '@/lib/api';
 import StatusBadge from '@/components/ui/StatusBadge';
 import Timeline from '@/components/ui/Timeline';
+import EvidencePanel from '@/components/ui/EvidencePanel';
 import { ArrowRight, Clock, CheckCircle } from 'lucide-react';
 
 interface FIR {
@@ -241,6 +242,9 @@ export default function OfficerCaseDetailPage() {
           currentStatus={fir.status}
         />
       </div>
+
+      {/* Evidence Panel */}
+      <EvidencePanel firId={fir.id} />
     </div>
   );
 }

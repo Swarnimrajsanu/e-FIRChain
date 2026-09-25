@@ -10,6 +10,9 @@ const CONTRACT_ABI = [
   'function verifyFIR(string calldata firId, string calldata providedHash) external view returns (bool)',
   'function getFIR(string calldata firId) external view returns (string memory, uint256, string memory, bool)',
   'function exists(string calldata firId) external view returns (bool)',
+  'function anchorEvidence(string calldata firId, string calldata evidenceId, string calldata fileHash, string calldata fileName) external',
+  'function verifyEvidence(string calldata firId, string calldata evidenceId, string calldata providedHash) external view returns (bool isValid, uint256 uploadedAt)',
+  'function getEvidence(string calldata firId, string calldata evidenceId) external view returns (string memory fileHash, string memory fileName, address uploadedBy, uint256 uploadedAt)'
 ];
 
 export class BlockchainService {
@@ -74,6 +77,24 @@ export class BlockchainService {
       return await this.contract.exists(firId);
     } catch (error: any) {
       throw new Error(`Failed to check FIR existence: ${error.message}`);
+    }
+  }
+
+  public async anchorEvidence(firId: string, evidenceId: string, fileHash: string, fileName: string): Promise<string> {
+    try {
+      const tx = await this.contract.anchorEvidence(firId, evidenceId, fileHash, fileName);
+      return tx.hash;
+    } catch (error: any) {
+      throw new Error(`Failed to anchor evidence on blockchain: ${error.message}`);
+    }
+  }
+
+  public async verifyEvidence(firId: string, evidenceId: string, providedHash: string): Promise<{ isValid: boolean; uploadedAt: number }> {
+    try {
+      const [isValid, uploadedAt] = await this.contract.verifyEvidence(firId, evidenceId, providedHash);
+      return { isValid, uploadedAt: Number(uploadedAt) };
+    } catch (error: any) {
+      throw new Error(`Failed to verify evidence on blockchain: ${error.message}`);
     }
   }
 

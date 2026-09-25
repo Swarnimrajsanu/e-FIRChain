@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { AuditAction } from '../services/auditService';
 import { ALLOWED_TRANSITIONS } from '../types/fir';
+import { anchorEvidenceOnBlockchain } from './blockchainIntegration';
 
 const prisma = new PrismaClient();
 
@@ -393,6 +394,11 @@ export const uploadEvidence = async (
       action: AuditAction.EVIDENCE_UPLOADED,
       description: `Evidence ${fileData.fileName} uploaded by ${uploadedBy}`,
     },
+  });
+
+  // Async blockchain anchoring (fire and forget)
+  anchorEvidenceOnBlockchain(firId, evidence.id, fileData.fileHash, fileData.fileName).catch(err => {
+    console.error('Evidence blockchain anchoring failed:', err);
   });
 
   return evidence;

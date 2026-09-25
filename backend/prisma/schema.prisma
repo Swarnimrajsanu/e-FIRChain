@@ -58,14 +58,16 @@ model CaseAssignment {
 }
 
 model Evidence {
-  id         String   @id @default(cuid())
-  firId      String
-  fileName   String
-  fileUrl    String
-  fileHash   String
-  fileType   String
-  uploadedBy String
-  uploadedAt DateTime @default(now())
+  id               String   @id @default(cuid())
+  firId            String
+  fileName         String
+  fileUrl          String
+  fileHash         String
+  fileType         String
+  uploadedBy       String
+  uploadedAt       DateTime @default(now())
+  blockchainTxHash String?
+  blockchainStatus String   @default("PENDING")
   
   fir        FIR      @relation(fields: [firId], references: [id], onDelete: Cascade)
   uploader   User      @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)

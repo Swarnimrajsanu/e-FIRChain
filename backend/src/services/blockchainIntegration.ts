@@ -211,3 +211,29 @@ async function updateOnBlockchain(firId: string, hash: string, newStatus: string
     console.error(`❌ Failed to update FIR ${firId} on blockchain:`, error.message);
   }
 }
+
+/**
+ * Anchor evidence to blockchain asynchronously.
+ */
+export async function anchorEvidenceOnBlockchain(firId: string, evidenceId: string, fileHash: string, fileName: string) {
+  try {
+    const bs = new BlockchainService();
+    const txHash = await bs.anchorEvidence(firId, evidenceId, fileHash, fileName);
+
+    await prisma.evidence.update({
+      where: { id: evidenceId },
+      data: {
+        blockchainTxHash: txHash,
+        blockchainStatus: 'CONFIRMED',
+      },
+    });
+
+    console.log(`✅ Evidence ${evidenceId} anchored on blockchain: ${txHash}`);
+  } catch (error: any) {
+    console.error(`❌ Failed to anchor evidence ${evidenceId} on blockchain:`, error.message);
+    await prisma.evidence.update({
+      where: { id: evidenceId },
+      data: { blockchainStatus: 'FAILED' },
+    });
+  }
+}

@@ -22,7 +22,7 @@ const config: HardhatUserConfig = {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL || '',
       chainId: 11155111,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY || ''],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY || '0x0000000000000000000000000000000000000000000000000000000000000001'],
     },
   },
   etherscan: {
