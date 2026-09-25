@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  phone         String?
+  role          String    @default("CITIZEN")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  filedFIRs     FIR[]
+  assignedCases CaseAssignment[]
+  updates       CaseUpdate[]
+  auditLogs     AuditLog[]
+  evidence      Evidence[]
+}
+
+model FIR {
+  id              String          @id @default(cuid())
+  firNumber       String          @unique
+  complainantId   String
+  title           String
+  description     String
+  location        String
+  incidentDate    DateTime
+  status          String          @default("SUBMITTED")
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  complainant     User            @relation(fields: [complainantId], references: [id], onDelete: Cascade)
+  assignments     CaseAssignment[]
+  evidence        Evidence[]
+  updates         CaseUpdate[]
+  blockchainRecord BlockchainRecord?
+  auditLogs       AuditLog[]
+}
+
+model CaseAssignment {
+  id          String   @id @default(cuid())
+  firId       String
+  officerId   String
+  assignedAt  DateTime @default(now())
+  assignedBy  String?
+  
+  fir         FIR      @relation(fields: [firId], references: [id], onDelete: Cascade)
+  officer     User     @relation(fields: [officerId], references: [id], onDelete: Cascade)
+  
+  @@unique([firId, officerId])
+}
+
+model Evidence {
+  id         String   @id @default(cuid())
+  firId      String
+  fileName   String
+  fileUrl    String
+  fileHash   String
+  fileType   String
+  uploadedBy String
+  uploadedAt DateTime @default(now())
+  
+  fir        FIR      @relation(fields: [firId], references: [id], onDelete: Cascade)
+  uploader   User      @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+}
+
+model CaseUpdate {
+  id          String    @id @default(cuid())
+  firId       String
+  officerId   String
+  status      String
+  description String?
+  createdAt   DateTime  @default(now())
+  
+  fir         FIR       @relation(fields: [firId], references: [id], onDelete: Cascade)
+  officer     User      @relation(fields: [officerId], references: [id], onDelete: Cascade)
+}
+
+model BlockchainRecord {
+  id                String            @id @default(cuid())
+  firId             String            @unique
+  dataHash          String
+  transactionHash   String?
+  blockNumber       Int?
+  blockchainStatus  String            @default("PENDING")
+  createdAt         DateTime          @default(now())
+  confirmedAt       DateTime?
+  
+  fir               FIR               @relation(fields: [firId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String        @id @default(cuid())
+  userId      String?
+  firId       String?
+  action      String
+  description String?
+  ipAddress   String?
+  timestamp   DateTime      @default(now())
+  
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  fir         FIR?          @relation(fields: [firId], references: [id], onDelete: SetNull)
+}

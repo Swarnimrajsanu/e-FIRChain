@@ -1,0 +1,11 @@
+export const AuditAction = {
+  FIR_CREATED: 'FIR_CREATED',
+  FIR_STATUS_CHANGED: 'FIR_STATUS_CHANGED',
+  FIR_VERIFIED: 'FIR_VERIFIED',
+  FIR_REJECTED: 'FIR_REJECTED',
+  FIR_ASSIGNED: 'FIR_ASSIGNED',
+  EVIDENCE_UPLOADED: 'EVIDENCE_UPLOADED',
+  CASE_UPDATE_ADDED: 'CASE_UPDATE_ADDED',
+} as const;
+
+export type AuditActionType = typeof AuditAction[keyof typeof AuditAction];
