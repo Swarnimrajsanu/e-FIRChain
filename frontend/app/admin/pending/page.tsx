@@ -37,7 +37,9 @@ interface FIR {
   }>;
 }
 
-export default function AdminPendingPage() {
+import { Suspense } from 'react';
+
+function AdminPendingContent() {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -195,7 +197,12 @@ export default function AdminPendingPage() {
                         <span className="font-mono font-bold text-navy">{fir.firNumber}</span>
                         <StatusBadge status={fir.status} />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900">{fir.title}</h3>
+                      <h3
+                        onClick={() => router.push(`/firs/${fir.id}`)}
+                        className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                      >
+                        {fir.title}
+                      </h3>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -268,7 +275,12 @@ export default function AdminPendingPage() {
                         <span className="font-mono font-bold text-navy">{fir.firNumber}</span>
                         <StatusBadge status={fir.status} />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900">{fir.title}</h3>
+                      <h3
+                        onClick={() => router.push(`/firs/${fir.id}`)}
+                        className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-primary transition-colors"
+                      >
+                        {fir.title}
+                      </h3>
                     </div>
 
                     {/* Police Officer Assignment Widget */}
@@ -333,5 +345,13 @@ export default function AdminPendingPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function AdminPendingPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[calc(100vh-8rem)]"><div className="animate-spin rounded-full h-12 w-12 border-4 border-navy border-t-transparent" /></div>}>
+      <AdminPendingContent />
+    </Suspense>
   );
 }

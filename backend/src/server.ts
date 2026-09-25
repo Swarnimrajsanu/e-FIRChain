@@ -7,6 +7,7 @@ import { sanitizeInput } from './middleware/sanitize'
 import authRoutes from './routes/auth'
 import blockchainRoutes from './routes/blockchain'
 import firRoutes from './routes/fir'
+import auditRoutes from './routes/audit'
 import { logger, requestLogger } from './services/logger'
 
 dotenv.config()
@@ -60,6 +61,7 @@ app.use(sanitizeInput)
 app.use('/api/auth', authRoutes)
 app.use('/api/firs', firRoutes)
 app.use('/api/blockchain', blockchainRoutes)
+app.use('/api/audit', auditRoutes)
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok' })

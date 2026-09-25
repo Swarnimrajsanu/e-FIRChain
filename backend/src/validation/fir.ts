@@ -29,6 +29,7 @@ export const updateStatusSchema = z.object({
       'CLOSED',
       'REJECTED',
     ]),
+    notes: z.string().max(2000, 'Notes must be 2000 characters or less').optional(),
   }),
 });
 

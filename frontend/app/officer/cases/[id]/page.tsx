@@ -94,7 +94,7 @@ export default function OfficerCaseDetailPage() {
     setUpdating(true);
 
     try {
-      await api.patch(`/firs/${id}/status`, { status });
+      await api.patch(`/firs/${id}/status`, { status, notes });
       setFir(prev => prev ? { ...prev, status } : null);
       setStatus(''); // reset so dropdown shows "Select a status..."
       setUpdating(false);

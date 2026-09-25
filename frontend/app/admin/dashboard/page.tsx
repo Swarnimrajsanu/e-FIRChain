@@ -168,11 +168,15 @@ export default function AdminDashboardPage() {
                   .filter((f: FIR) => f.status === 'SUBMITTED' || f.status === 'UNDER_REVIEW')
                   .slice(0, 3)
                   .map((fir) => (
-                    <div key={fir.id} className="px-6 py-4 flex items-center justify-between">
+                    <div
+                      key={fir.id}
+                      onClick={() => router.push(`/firs/${fir.id}`)}
+                      className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+                    >
                       <div>
-                        <p className="font-medium text-gray-900">{fir.title}</p>
+                        <p className="font-medium text-gray-900 hover:text-primary transition-colors">{fir.title}</p>
                         <p className="text-sm text-gray-500">
-                          {fir.firNumber} - {fir.complainant.name}
+                          {fir.firNumber} - {fir.complainant?.name || 'Unknown'}
                         </p>
                       </div>
                       <StatusBadge status={fir.status} />

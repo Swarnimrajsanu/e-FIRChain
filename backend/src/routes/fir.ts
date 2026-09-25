@@ -68,12 +68,14 @@ router.patch('/:id/status', authenticate, async (req: AuthenticatedRequest, res)
     }
 
     const newStatus = result.data.body.status as string;
+    const notes = result.data.body.notes as string | undefined;
     const updatedFIR = await updateFIRStatus(
       req.params.id,
       newStatus,
       req.user!.userId,
       req.user!.userId,
-      req.user!.role
+      req.user!.role,
+      notes
     );
 
     res.status(200).json(updatedFIR);
@@ -173,6 +175,32 @@ router.get('/:id/evidence', authenticate, async (req: AuthenticatedRequest, res)
     res.status(200).json(evidence);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Failed to fetch evidence' });
+  }
+});
+
+// GET /api/firs/:id/evidence/:evidenceId/url - Get presigned URL for evidence (ADMIN only)
+router.get('/:id/evidence/:evidenceId/url', authenticate, requireRole('ADMIN'), async (req: AuthenticatedRequest, res) => {
+  try {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    
+    const evidence = await prisma.evidence.findUnique({
+      where: { id: req.params.evidenceId, firId: req.params.id }
+    });
+
+    if (!evidence) {
+      return res.status(404).json({ error: 'Evidence not found' });
+    }
+
+    const { getPresignedUrl } = await import('../services/storageService');
+    const keyIndex = evidence.fileUrl.indexOf('evidence/');
+    const key = keyIndex !== -1 ? evidence.fileUrl.substring(keyIndex) : evidence.fileUrl;
+    
+    const presignedUrl = await getPresignedUrl(key);
+    res.status(200).json({ url: presignedUrl });
+  } catch (error: any) {
+    console.error('Error getting presigned URL:', error);
+    res.status(500).json({ error: 'Failed to get presigned URL' });
   }
 });
 

@@ -121,10 +121,20 @@ export default function EvidencePanel({ firId }: { firId: string }) {
                   <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <a href={item.fileUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-primary hover:underline flex items-center gap-1">
+                  <button 
+                    onClick={async () => {
+                      try {
+                        const data = await api.get(`/firs/${firId}/evidence/${item.id}/url`);
+                        window.open(data.url, '_blank');
+                      } catch (e: any) {
+                        alert(e.response?.data?.error || 'Failed to open evidence file or permission denied.');
+                      }
+                    }}
+                    className="font-medium text-primary hover:underline flex items-center gap-1 bg-transparent border-none p-0 cursor-pointer"
+                  >
                     {item.fileName}
                     <ExternalLink className="w-3 h-3" />
-                  </a>
+                  </button>
                   <p className="text-xs text-gray-500 mt-1">
                     Uploaded by {item.uploader.name} on {new Date(item.uploadedAt).toLocaleString()}
                   </p>

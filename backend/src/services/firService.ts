@@ -167,6 +167,15 @@ export const getFIRById = async (
       },
       evidence: {
         orderBy: { uploadedAt: 'desc' },
+        include: {
+          uploader: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
       },
       updates: {
         orderBy: { createdAt: 'desc' },
@@ -211,7 +220,8 @@ export const updateFIRStatus = async (
   newStatus: string,
   officerId: string,
   userId: string,
-  role: string
+  role: string,
+  notes?: string
 ): Promise<any> => {
   const fir = await prisma.fIR.findUnique({
     where: { id: firId },
@@ -263,6 +273,17 @@ export const updateFIRStatus = async (
       },
     },
   });
+
+  if (notes || role === 'POLICE') {
+    await prisma.caseUpdate.create({
+      data: {
+        firId,
+        officerId: userId,
+        status: newStatus,
+        description: notes || `Status updated to ${newStatus}`,
+      }
+    });
+  }
 
   await prisma.auditLog.create({
     data: {

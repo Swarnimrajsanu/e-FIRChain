@@ -46,6 +46,15 @@ interface FIR {
     transactionHash: string;
     blockchainStatus: string;
   };
+  updates: Array<{
+    id: string;
+    status: string;
+    description: string;
+    createdAt: string;
+    officer: {
+      name: string;
+    };
+  }>;
 }
 
 const statusSteps = [
@@ -238,12 +247,47 @@ export default function FIRDetailPage() {
                       <CheckCircle className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900">{evidence.fileName}</p>
+                      {isAdmin ? (
+                        <p 
+                          className="font-medium text-primary hover:underline cursor-pointer"
+                          onClick={async () => {
+                            try {
+                              const data = await api.get(`/firs/${fir.id}/evidence/${evidence.id}/url`);
+                              window.open(data.url, '_blank');
+                            } catch (e) {
+                              alert('Failed to open evidence file or permission denied.');
+                            }
+                          }}
+                        >
+                          {evidence.fileName} (Click to view)
+                        </p>
+                      ) : (
+                        <p className="font-medium text-gray-900">{evidence.fileName}</p>
+                      )}
                       <p className="text-xs text-gray-500">
-                        Uploaded by {evidence.uploader.name} on {new Date(evidence.uploadedAt).toLocaleDateString()}
+                        Uploaded by {evidence.uploader?.name || 'Unknown'} on {new Date(evidence.uploadedAt).toLocaleDateString()}
                       </p>
                     </div>
                     <span className="text-sm text-gray-600">{evidence.fileType}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Updates */}
+          {fir.updates && fir.updates.length > 0 && (
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 mt-6">
+              <h2 className="text-lg font-semibold text-primary mb-4">Investigation Updates</h2>
+              <div className="space-y-4">
+                {fir.updates.map((update) => (
+                  <div key={update.id} className="border-l-2 border-accent pl-4 py-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-semibold text-gray-900">{update.status.replace(/_/g, ' ')}</span>
+                      <span className="text-xs text-gray-500">{new Date(update.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-2">{update.description}</p>
+                    <p className="text-xs text-gray-500 italic">By Officer {update.officer?.name || 'Unknown'}</p>
                   </div>
                 ))}
               </div>
