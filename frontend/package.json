@@ -2,6 +2,10 @@
   "name": "efirchain-frontend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "npm@10.9.2",
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
